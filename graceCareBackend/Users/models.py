@@ -21,11 +21,28 @@ class User(AbstractUser):
         ('O-', 'O-'),
     ]
 
+    DOCTOR_SPECIALIZATION_CHOICES = [
+        ('general_practitioner', 'General Practitioner'),
+        ('cardiologist', 'Cardiologist'),
+        ('dermatologist', 'Dermatologist'),
+        ('neurologist', 'Neurologist'),
+        ('pediatrician', 'Pediatrician'),
+        ('psychiatrist', 'Psychiatrist'),
+        ('oncologist', 'Oncologist'),
+        ('surgeon', 'Surgeon'),
+        ('orthopedic', 'Orthopedic'),
+        ('gynecologist', 'Gynecologist'),
+        ('urologist', 'Urologist'),
+    ]
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     registered_as = models.CharField(max_length=20, choices=REGISTERED_AS_CHOICES, default='patient')
     phoneNumber = models.CharField(max_length=15, blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
     blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES, blank=True, null=True)
+    doctor_specialization = models.CharField(max_length=30, choices=DOCTOR_SPECIALIZATION_CHOICES, blank=True, null=True)
+    doctor_license_number = models.CharField(max_length=50, blank=True, null=True)
+    doctor_years_of_experience = models.IntegerField(blank=True, null=True)
     policy_agreed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 

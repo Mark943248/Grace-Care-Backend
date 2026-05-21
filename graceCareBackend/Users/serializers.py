@@ -83,7 +83,7 @@ class UserDashboardSerializer(serializers.ModelSerializer):
             'registered_as', 'phoneNumber', 'date_of_birth', 'blood_group',
             'is_active', 'date_joined', 'created_at'
         ]
-        read_only_fields = ['id', 'first_name', 'registered_as', 'blood_group', 'date_joined','created_at']
+        read_only_fields = ['id', 'registered_as', 'blood_group', 'date_joined','created_at']
 
     def get_full_name(self, obj):
         """Return formatted full name."""
