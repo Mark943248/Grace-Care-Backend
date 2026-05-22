@@ -11,7 +11,7 @@ class SymptomCheckerView(APIView):
     API endpoint for symptom checking. 
     Accepts POST requests with symptom data, processes it using the DeepSeek API, and returns triage urgency and possible conditions.
     """
-
+    
     def post(self, request):
         symptoms_data = request.data
         print(f"Received symptom data: {symptoms_data}")

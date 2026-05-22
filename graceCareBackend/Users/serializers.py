@@ -15,7 +15,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'email', 'password', 'password_confirm', 'first_name', 'last_name',
-            'registered_as', 'phoneNumber', 'date_of_birth', 'blood_group', 'policy_agreed', 'created_at'
+            'registered_as', 'phoneNumber', 'date_of_birth', 'doctor_specialization', 'doctor_price_per_session', 'doctor_license_number', 'doctor_years_of_experience', 'blood_group', 'policy_agreed', 'created_at'
         ]
         extra_kwargs = {
             'email': {'required': True, 'allow_blank': False},
@@ -33,8 +33,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     def validate_phoneNumber(self, value):
         """Validate phone number format."""
-        if value and not value.replace('+', '').replace('-', '').replace(' ', '').isdigit():
-            raise serializers.ValidationError("Phone number must contain only digits, spaces, +, or -.")
+        if value and not value.replace('+', '').replace('-', '').replace(' ', '').replace('(', '').replace(')', '').isdigit():
+            raise serializers.ValidationError("Phone number must contain only digits, spaces, or -.")
         return value
 
     def validate_policy_agreed(self, value):
@@ -65,6 +65,10 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             date_of_birth=validated_data.get('date_of_birth'),
             blood_group=validated_data.get('blood_group', ''),
             policy_agreed=validated_data.get('policy_agreed', False),
+            doctor_specialization=validated_data.get('doctor_specialization', ''),
+            doctor_license_number=validated_data.get('doctor_license_number', ''),
+            doctor_years_of_experience=validated_data.get('doctor_years_of_experience', None),
+            doctor_price_per_session=validated_data.get('doctor_price_per_session', None),
         )
         return user
 
@@ -80,7 +84,7 @@ class UserDashboardSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'email', 'full_name', 'first_name', 'last_name',
-            'registered_as', 'phoneNumber', 'date_of_birth', 'blood_group',
+            'registered_as', 'phoneNumber', 'date_of_birth', 'doctor_specialization', 'doctor_price_per_session', 'doctor_license_number', 'doctor_years_of_experience', 'blood_group',
             'is_active', 'date_joined', 'created_at'
         ]
         read_only_fields = ['id', 'registered_as', 'blood_group', 'date_joined','created_at']
