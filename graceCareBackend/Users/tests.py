@@ -231,6 +231,8 @@ class UserAuthenticationViewTests(TestCase):
             first_name='Test',
             last_name='User'
         )
+        # Create a token for the test user (simulating a logged-in user)
+        self.token = Token.objects.create(user=self.test_user)
 
     def test_user_registration_success(self):
         """Test successful user registration."""
@@ -269,6 +271,22 @@ class UserAuthenticationViewTests(TestCase):
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 400)
+
+    def test_logout_user(self):
+        """Test user logout."""
+        token = Token.objects.get(user=self.test_user)
+        try:
+            response = self.client.get(
+              reverse('logout_user'),
+              HTTP_AUTHORIZATION=f'Token {token.key}'
+            )
+            print(f"Logout response status: {response.status_code}, content: {response.content}")
+            self.assertEqual(response.status_code, 200)
+            # Verify token is deleted
+            self.assertFalse(Token.objects.filter(user=self.test_user).exists())
+        except Exception as e:
+            print(f"Error during logout test: {e}")
+            self.fail("Logout test failed due to an unexpected error.")
 
     def test_login_with_email(self):
         """Test login using email."""

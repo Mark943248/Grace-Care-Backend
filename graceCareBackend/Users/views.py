@@ -46,7 +46,26 @@ def login_user(request):
         return Response({'message': 'Login successful.', 'user_id': str(user.id), 'token': token.key}, status=200)
     else:
         return Response({'error': 'Invalid email/username or password.'}, status=401)
-    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def logout_user(request):
+    """
+    API endpoint for user logout.
+    Accepts GET requests, deletes the user's authentication token, and logs them out.
+    """
+    user = request.user
+    if not user.is_authenticated:
+        return Response({'error': 'Authentication required.'}, status=401)
+
+    try:
+        token = Token.objects.get(user=user)
+        token.delete()
+        print(f"User {user.first_name} logged out successfully. Token deleted.")
+        return Response({'message': 'Logout successful.'}, status=200)
+    except Token.DoesNotExist:
+        print(f"User {user.first_name} attempted to log out but no token was found.")
+        return Response({'error': 'No active session found.'}, status=400)
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def user_dashboard(request):
