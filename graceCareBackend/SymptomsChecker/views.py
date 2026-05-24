@@ -3,6 +3,7 @@ import json
 import logging
 import ollama
 from django.shortcuts import render
+from django.conf import settings
 from .models import SymptomCheker
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -113,6 +114,7 @@ class SymptomCheckerView(APIView):
             
             # Extract response content
             gemma_response = response.get('message', {}).get('content', '')
+            print(f"Raw response from Ollama API: {gemma_response}")
             if not gemma_response:
                 logger.error("Empty response from Ollama API")
                 return Response(
@@ -121,6 +123,16 @@ class SymptomCheckerView(APIView):
                 )
             
             ai_response = json.loads(gemma_response)
+            # Store AI response to file for debugging (optional)
+            try:
+                logs_dir = os.path.join(settings.BASE_DIR, 'SymptomsChecker', 'Systemcheckerlogs')
+                os.makedirs(logs_dir, exist_ok=True)
+                log_file = os.path.join(logs_dir, 'AI_response.json')
+                with open(log_file, 'w') as f:
+                    json.dump(ai_response, f, indent=4)
+            except Exception as log_error:
+                logger.warning(f"Could not save AI response log: {log_error}")
+            
             logger.info(f"Successfully processed symptoms. Triage urgency: {ai_response.get('triage_urgency')}")
             
         except json.JSONDecodeError as e:
@@ -130,7 +142,7 @@ class SymptomCheckerView(APIView):
                 status=500
             )
         except Exception as e:
-            logger.error(f"Error processing AI response: {e}", exc_info=True)
+            logger.error(f"Error communicating with AI service: {e}", exc_info=True)
             return Response(
                 {'error': 'Failed to process symptoms. Please try again later.'}, 
                 status=500

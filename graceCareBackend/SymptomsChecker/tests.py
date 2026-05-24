@@ -362,31 +362,28 @@ class SymptomCheckerViewTests(TestCase):
             "immediate_actions": ["Rest", "Hydration", "Monitor temperature"]
         }
 
-        try:
-          mock_client = MagicMock()
-          mock_client.chat.return_value = self._create_ollama_response(ai_response)
-          mock_ollama_client.return_value = mock_client
+        mock_client = MagicMock()
+        mock_client.chat.return_value = self._create_ollama_response(ai_response)
+        mock_ollama_client.return_value = mock_client
         
-          symptom_data = {
+        symptom_data = {
             'age': 35,
             'gender': 'Female',
             'duration_of_symptoms': '3 days',
             'symptoms': ["high fever", "body aches", "fatigue", "cough"],
             'additional_info': ''
-          }
+        }
         
-          self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token[0].key)
-          try:
-            response = self.client.post(self.url, symptom_data, format='json')
-          except json.JSONDecodeError as e:
-            print(f"JSON decode error during test execution: {e}")
-            self.fail("JSONDecodeError raised during test execution")
-        except Exception as e:
-           print(f"Error during test execution: {e}")
-           self.assertEqual(response.status_code, 200)
-           self.assertEqual(len(response.data['possible_conditions']), 3)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token[0].key)
+        response = self.client.post(self.url, symptom_data, format='json')
         
+        # Verify response
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['possible_conditions']), 3)
+        
+        # Verify database entry
         symptom_record = SymptomCheker.objects.first()
+        self.assertIsNotNone(symptom_record)
         conditions = json.loads(symptom_record.possible_conditions)
         condition_names = [cond['condition_name'] for cond in conditions]
         self.assertIn('Flu', condition_names)
