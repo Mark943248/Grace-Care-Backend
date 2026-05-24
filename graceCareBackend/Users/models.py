@@ -70,6 +70,7 @@ class User(AbstractUser):
     doctor_specialization = models.CharField(max_length=30, choices=DOCTOR_SPECIALIZATION_CHOICES, blank=True, null=True)
     doctor_price_per_session = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     doctor_license_number = models.CharField(max_length=50, blank=True, null=True)
+    is_doctor = models.BooleanField(default=False)
     doctor_years_of_experience = models.IntegerField(blank=True, null=True)
     policy_agreed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -83,6 +84,11 @@ class User(AbstractUser):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
+
+    def is_user_a_doctor(self):
+        if self.registered_as == 'doctor':
+            self.is_doctor = True
+        return self.is_doctor
 
     def __str__(self):
         return self.first_name + ' ' + self.last_name + ' (' + self.registered_as + ')'

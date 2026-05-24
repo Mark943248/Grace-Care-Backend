@@ -1,0 +1,7 @@
+{
+    "doctor": "doctor@example.com",
+    "type_of_appointment": "Consultation",
+    "appointment_date": "2026-05-29",
+    "appointment_time": "14:30:00",
+    "reason_for_appointment": "Regular checkup"
+}

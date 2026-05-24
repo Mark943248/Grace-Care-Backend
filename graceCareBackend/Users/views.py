@@ -1,4 +1,7 @@
+import json
+import os
 from rest_framework import generics, permissions
+from django.conf import settings
 from .serializers import UserRegistrationSerializer, UserDashboardSerializer
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -15,7 +18,11 @@ def register_User(request):
     API endpoint for user registration.
     Accepts POST requests with user data, validates it, and creates a new user account.
     """
-    serializer = UserRegistrationSerializer(data=request.data)
+    data = request.data
+    users_logs_DIR = os.path.join(settings.BASE_DIR, 'Users', 'User_logs', 'users_data.json')
+    with open(users_logs_DIR, 'w') as f:
+        json.dump(data, f, indent=4)
+    serializer = UserRegistrationSerializer(data=data)
     if serializer.is_valid():
         user = serializer.save()
         token, created = Token.objects.get_or_create(user=user)
